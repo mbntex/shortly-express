@@ -56,6 +56,10 @@ class Model {
     return executeQuery(queryString, parsedOptions.values).then(results => results[0]);
   }
 
+  testHi() {
+    console.log('model Function called');
+  }
+
   /**
    * Creates a new record in the table.
    * @param {Object} options - An object with key/value pairs, where the keys should match

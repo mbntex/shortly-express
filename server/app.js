@@ -6,6 +6,11 @@ const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 const models = require('./models');
 
+///
+const userFunctions = require('./models/user.js');
+const dbModel = require('./models/model.js');
+
+
 const app = express();
 
 app.set('views', `${__dirname}/views`);
@@ -37,6 +42,79 @@ app.get('/links',
       res.status(500).send(error);
     });
 });
+
+
+//OUR CODE//////////////////////////////////////////////////
+
+
+
+app.get('/login', (req, res) => {
+  console.log('GET request recieved!');
+  res.render('login');
+});
+
+app.get('/signup', (req, res) => {
+  console.log('GET request recieved!');
+  res.render('signup');
+});
+
+app.post('/login', (req, res) => {
+  console.log('POST request recieved!');
+  var username = req.body.username;
+  var password = req.body.password;
+  console.log(username, password);
+  
+});
+
+
+app.post('/signup', (req, res) => {
+  //console.log('POST request recieved!');
+  //console.log('REQ123 =', req.body);
+  
+  //CHECK IF USER EXISTS
+  //can call funciton in model this way because of parent child relationship to user.
+  userFunctions.testHi();
+  userFunctions.getAll({username: req.body.username})
+  .then(results => {
+    console.log('GETALLTEST = ', results);
+    if (results.length > 0) {
+      res.redirect(301, '/signup');
+    } else {
+      var username = req.body.username;
+      var password = req.body.password;
+      var userNameAndPasswordObj = {username, password};
+      //console.log(userNameAndPasswordObj);
+      //userFunctions.testHello();
+      userFunctions.create(userNameAndPasswordObj);
+      res.redirect(301, '/');
+    }
+  });
+  //Simple Promise example
+  // userFunctions.get({username: 'David'})
+  // .then(results => {
+  //   console.log('JUST GET = ', results);
+  // }); 
+  
+});
+
+
+/////
+
+
+// GETALLTEST =  [ RowDataPacket {
+//     id: 1,
+//     username: 'Marco',
+//     password: '0c0f099fba859d48e97d7d9c521f15e040845854cce2f3b4069c30f0ba110759',
+//     salt: '08204d23402f286bcd425b2a275bf14e4dabc9753fe772e4a4681c05e8063549' } ]
+// JUST GET =  RowDataPacket {
+//   id: 1,
+//   username: 'Marco',
+//   password: '0c0f099fba859d48e97d7d9c521f15e040845854cce2f3b4069c30f0ba110759',
+//   salt: '08204d23402f286bcd425b2a275bf14e4dabc9753fe772e4a4681c05e8063549' }
+
+//////////////////////////////////////////////////////////////
+
+
 
 app.post('/links', 
 (req, res, next) => {
