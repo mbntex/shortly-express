@@ -55,6 +55,7 @@ class Sessions extends Model {
     let hash = utils.createHash(data);
     return super.create.call(this, { hash });
   }
+
 }
 
 module.exports = new Sessions();

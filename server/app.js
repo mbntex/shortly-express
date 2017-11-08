@@ -9,7 +9,9 @@ const models = require('./models');
 ///
 const userFunctions = require('./models/user.js');
 const dbModel = require('./models/model.js');
-
+const cookieParser = require('./middleware/cookieParser.js');
+const sessionsFn = require('./models/session.js');
+const sessionsAuth = require('./middleware/auth.js');
 
 const app = express();
 
@@ -20,6 +22,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
+
+///OUR CODE /////////
+app.use(cookieParser);
+app.use(sessionsAuth.createSession);
+
+
+/////////////////////
 
 
 app.get('/', 
@@ -62,8 +71,25 @@ app.post('/login', (req, res) => {
   console.log('POST request recieved!');
   var username = req.body.username;
   var password = req.body.password;
-  console.log(username, password);
-  
+  console.log('username = ', username, 'password = ', password);
+  userFunctions.get({username: req.body.username})
+  .then(results => {
+    if (results) {
+      // console.log('GETFNTEST SIGNIN = ', results);
+      // console.log('WE HAVE A CURRENT USER');
+      if (userFunctions.compare(req.body.password, results.password, results.salt)) {
+        //console.log('USER WITH CORRECT PASSWORD');
+        res.redirect(301, '/');
+      } else {
+        //console.log('USER, BUT WRONG PASSWORD');
+        res.redirect(301, '/login');
+      }
+      //res.redirect(301, '/');
+    } else {
+      //console.log('THIS IS NOT A CURRENT USER');
+      res.redirect(301, '/login');
+    }  
+  });  
 });
 
 
